@@ -35,6 +35,10 @@ public abstract class DataSnapshotMapper<T, U> implements Function<T, U> {
       return new TypedMapDataSnapshotMapper<>(clazz);
    }
 
+   public static <U> DataSnapshotMapper<DataSnapshot, LinkedHashMap<String, U>> mapOf(Class<U> clazz, Function<DataSnapshot, U> mapper) {
+      return new TypedMapDataSnapshotMapper<>(clazz, mapper);
+   }
+
    public static <U> DataSnapshotMapper<DataSnapshot, U> of(GenericTypeIndicator<U> genericTypeIndicator) {
       return new GenericTypedDataSnapshotMapper<U>(genericTypeIndicator);
    }
