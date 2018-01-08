@@ -95,16 +95,24 @@ public abstract class DataSnapshotMapper<T, U> implements Function<T, U> {
    private static class TypedMapDataSnapshotMapper<U> extends DataSnapshotMapper<DataSnapshot, LinkedHashMap<String, U>> {
 
       private final Class<U> clazz;
+      private final Function<DataSnapshot, U> mapper;
 
       TypedMapDataSnapshotMapper(final Class<U> clazz) {
-         this.clazz = clazz;
+          this(clazz, null);
+      }
+
+      TypedMapDataSnapshotMapper(final Class<U> clazz, final Function<DataSnapshot, U> mapper) {
+          this.clazz = clazz;
+          this.mapper = mapper;
       }
 
       @Override
-      public LinkedHashMap<String, U> apply(final DataSnapshot dataSnapshot) {
+      public LinkedHashMap<String, U> apply(final DataSnapshot dataSnapshot) throws Exception {
          LinkedHashMap<String, U> items = new LinkedHashMap<>();
          for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-            items.put(childSnapshot.getKey(), getDataSnapshotTypedValue(childSnapshot, clazz));
+            items.put(childSnapshot.getKey(), mapper != null
+               ? mapper.apply(childSnapshot)
+               : getDataSnapshotTypedValue(childSnapshot, clazz));
          }
          return items;
       }
